@@ -299,7 +299,7 @@ int main(int argc, char** argv) {
 
 	ret = workermain(client, address, port, verbose);
 	if (ret < 0) {
-		fprintf(stderr, "main(): error in jobsuppliermain()\n");
+		fprintf(stderr, "main(): error in workermain()\n");
 		free(client);
 		return -1;
 	}

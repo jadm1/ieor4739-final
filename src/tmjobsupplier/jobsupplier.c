@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
 
 	ret = jobsuppliermain(client, address, port, input_filename);
 	if (ret < 0) {
-		fprintf(stderr, "main(): error in client()\n");
+		fprintf(stderr, "main(): error in jobsuppliermain()\n");
 		free(client);
 		return -1;
 	}
