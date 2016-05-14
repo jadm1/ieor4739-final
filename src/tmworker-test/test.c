@@ -19,13 +19,13 @@ int testmain(int N, int T, trade_impact_priceshift_model* priceshift_model, trad
 
 	ret = trade_imp_pb_create(&pb, N, T, priceshift_model, prob_model);
 	if (ret != 0) {
-		fprintf(stderr, "clientmain(): error in trade_impact_problem_create()\n");
+		fprintf(stderr, "testmain(): error in trade_impact_problem_create()\n");
 		return -1;
 	}
 
 	ret = trade_imp_pb_optimize(pb, 1);
 	if (ret < 0) {
-		fprintf(stderr, "clientmain(): error in optimize_trade()\n");
+		fprintf(stderr, "testmain(): error in optimize_trade()\n");
 		return -1;
 	}
 

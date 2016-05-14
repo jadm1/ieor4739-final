@@ -21,7 +21,7 @@ typedef struct test_client {
 
 
 
-int testmain(test_client* client, char* address, const int port, int verbose) {
+int workermain(test_client* client, char* address, const int port, int verbose) {
 	int ret = 0;
 
 	trade_impact_problem* pb;
@@ -54,7 +54,7 @@ int testmain(test_client* client, char* address, const int port, int verbose) {
 
 	ret = loadsocklib();
 	if (ret < 0) {
-		fprintf(stderr, "jobsuppliermain(): error cannot start sockets library\n");
+		fprintf(stderr, "workermain(): error cannot start sockets library\n");
 		return -1;
 	}
 
@@ -63,7 +63,7 @@ int testmain(test_client* client, char* address, const int port, int verbose) {
 
 	ret = ntq_connect(&client->server, client->server_address, client->server_port);
 	if (ret != 0) {
-		fprintf(stderr, "jobsuppliermain(): error could not connect to ntq server\n");
+		fprintf(stderr, "workermain(): error could not connect to ntq server\n");
 		return -1;
 	}
 
@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	ret = testmain(client, address, port, verbose);
+	ret = workermain(client, address, port, verbose);
 	if (ret < 0) {
 		fprintf(stderr, "main(): error in jobsuppliermain()\n");
 		free(client);
