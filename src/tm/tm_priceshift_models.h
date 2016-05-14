@@ -1,5 +1,5 @@
-#ifndef TMW_PRICESHIFT_MODELS_H
-#define TMW_PRICESHIFT_MODELS_H
+#ifndef TM_PRICESHIFT_MODELS_H
+#define TM_PRICESHIFT_MODELS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,12 +8,19 @@ extern "C" {
 
 // Price shift Models
 
+/**
+ * This structure represents a price shift model
+ * It has a compute_priceshifts function used to compute the d vector initially
+ * And a void* params parameter used to hold a specific set of parameters for a given model
+ */
 typedef struct trade_impact_priceshift_model {
 	void (*compute_priceshifts)(double* d, int N, void* params);
 	void* params;
 } trade_impact_priceshift_model;
 
-
+/**
+ *  This is an example of a structure used to represent a specific set of parameters for a given model
+ */
 typedef struct priceshift_alphapi_prm {
 	double alpha;
 	double pi;

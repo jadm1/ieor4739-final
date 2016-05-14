@@ -5,14 +5,12 @@
 
 #include <utl.h>
 
-#include <tmw_opt.h>
-#include <tmw_priceshift_models.h>
-#include <tmw_prob_models.h>
+#include <tm_opt.h>
+#include <tm_priceshift_models.h>
+#include <tm_prob_models.h>
 
 
-
-
-int resultsavermain(int N, int T, trade_impact_priceshift_model* priceshift_model, trade_impact_prob_model* prob_model) {
+int testmain(int N, int T, trade_impact_priceshift_model* priceshift_model, trade_impact_prob_model* prob_model) {
 	int ret = 0;
 
 	trade_impact_problem* pb;
@@ -41,7 +39,7 @@ int resultsavermain(int N, int T, trade_impact_priceshift_model* priceshift_mode
 	printf("Optimal value for trade sequencing = %g\n", F(pb, 0, pb->N));
 
 
-	trade_imp_pb_fw_prop_deterministic(pb, 2, NULL, NULL);
+	trade_imp_pb_fwprop_deterministic(pb, 2, NULL, NULL);
 
 	ret = trade_imp_pb_delete(&pb);
 
@@ -152,7 +150,7 @@ int main(int argc, char** argv) {
 		print_usage(argv[0]);
 	}
 
-	ret = resultsavermain(N, T, &priceshift_model, &prob_model);
+	ret = testmain(N, T, &priceshift_model, &prob_model);
 
 
 	return ret;

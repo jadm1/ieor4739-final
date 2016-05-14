@@ -8,7 +8,7 @@
 #include <ntqc.h>
 
 
-#include <tmw_protocol.h>
+#include <tm_protocol.h>
 
 typedef struct test_client {
 	ntq_server* server;
@@ -18,7 +18,7 @@ typedef struct test_client {
 
 
 
-int resultsavermain(test_client* client, char* address, const int port, char* output_filename) {
+int testmain(test_client* client, char* address, const int port, char* output_filename) {
 	int ret = 0;
 
 	int t;
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	ret = resultsavermain(client, address, port, input_filename);
+	ret = testmain(client, address, port, input_filename);
 	if (ret < 0) {
 		fprintf(stderr, "main(): error in workermain()\n");
 		free(client);

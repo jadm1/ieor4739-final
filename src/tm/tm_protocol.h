@@ -1,5 +1,5 @@
-#ifndef TMW_PROTOCOL_H
-#define TMW_PROTOCOL_H
+#ifndef TM_PROTOCOL_H
+#define TM_PROTOCOL_H
 
 #ifdef __cplusplus
 extern "C" {

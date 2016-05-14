@@ -6,10 +6,10 @@
 #include <utl.h>
 #include <bs.h>
 #include <ntqc.h>
+#include <tm_priceshift_models.h>
+#include <tm_prob_models.h>
 
-#include <tmw_priceshift_models.h>
-#include <tmw_prob_models.h>
-#include <tmw_protocol.h>
+#include <tm_protocol.h>
 
 
 typedef struct test_client {
@@ -20,7 +20,7 @@ typedef struct test_client {
 
 
 
-int resultsavermain(test_client* client, char* address, const int port, char* input_filename) {
+int testmain(test_client* client, char* address, const int port, char* input_filename) {
 	int ret = 0;
 
 	FILE* input_file;
@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	ret = resultsavermain(client, address, port, input_filename);
+	ret = testmain(client, address, port, input_filename);
 	if (ret < 0) {
 		fprintf(stderr, "main(): error in client()\n");
 		free(client);

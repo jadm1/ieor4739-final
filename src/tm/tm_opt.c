@@ -1,5 +1,5 @@
 
-#include "../tm/tmw_opt.h"
+#include "tm_opt.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +10,10 @@
 
 
 
-
+/**
+ *  This function creates a trade impact model problem
+ *  It allocates all structures from the specified parameters
+ */
 int trade_imp_pb_create(trade_impact_problem** ppb, int N, int T, trade_impact_priceshift_model* priceshift_model, trade_impact_prob_model* prob_model) {
 	trade_impact_problem* pb;
 	int ret;
@@ -54,6 +57,10 @@ int trade_imp_pb_create(trade_impact_problem** ppb, int N, int T, trade_impact_p
 	return 0;
 }
 
+/**
+ * Delete a trade impact model problem
+ *  Frees everything
+ */
 int trade_imp_pb_delete(trade_impact_problem** ppb) {
 	trade_impact_problem* pb;
 
@@ -75,7 +82,93 @@ int trade_imp_pb_delete(trade_impact_problem** ppb) {
 }
 
 
-double trade_imp_pb_fw_prop_deterministic(trade_impact_problem* pb, int verbose, int* optimal_sells, double* optimal_prices) {
+/**
+ *  This is the main function used to build the optimal F matrix dynamically
+ *  It starts by filling the last stage (t=T-1) and then fills all other stages going backwards
+ */
+
+int trade_imp_pb_optimize(trade_impact_problem* pb, int verbose) {
+	int ret = 0;
+	double expected_revenue;
+	double best_expected_revenue;
+	int best_index;
+
+	double profit;
+	double newprice;
+	int sell;
+
+	int N = pb->N;
+	int T = pb->T;
+
+	int n, t;
+	int k, kp;
+
+	/*
+	 * Fill the last step
+	 */
+	t = T-1;
+	if (verbose >= 2) {
+		printf("t = %d\n", t); fflush(stdout);
+	}
+	best_expected_revenue = 0.0;
+	for (n = 0; n <= N; n++) {
+		expected_revenue = 0.0;
+		k = n; // trick because the quantity we are maximizing does not depend on n
+		for (kp = 0; kp <= k; kp++) {
+			expected_revenue += prob(pb, kp, k) * (double)kp;
+		}
+		expected_revenue *= pb->d[k];
+		if (expected_revenue > best_expected_revenue) {
+			best_expected_revenue = expected_revenue;
+		}
+		F(pb, t, n) = best_expected_revenue;
+		FP(pb, t, n) = n;
+	}
+
+	//printf("F(t=%d,.): ", T-1); UTLShowVector(N+1, &F(pb, t, 0)); // print some debug info
+
+	/*
+	 * propagate backwards
+	 */
+	for (t = T-2; t >= 0; t--) {
+		if (verbose >= 2) {
+			printf("t = %d\n", t); fflush(stdout);
+		}
+		for (n = 0; n <= N; n++) {
+			best_expected_revenue = 0.0;
+			best_index = 0;
+			for (k = 0; k <= n; k++) {
+				// compute the sum
+				expected_revenue = 0.0;
+				for (kp = 0; kp <= k; kp++) {
+					expected_revenue += prob(pb, kp, k) * ((double)kp + F(pb, t + 1, n - kp));
+				}
+				expected_revenue *= pb->d[k];
+				// update if best
+				if (expected_revenue > best_expected_revenue) {
+					best_expected_revenue = expected_revenue;
+					best_index = k;
+				}
+			}
+			// here we know the max
+			F(pb, t, n) = best_expected_revenue;
+			FP(pb, t, n) = best_index;
+		}
+	}
+
+
+	return 0;
+}
+
+
+
+
+/**
+ * Once trade_imp_pb_optimize() has been called and F has been built,
+ * This function shows how the optimal trading sequence can be performed by propagating forwards this time
+ * It optionally returns a sequence of optimal sell quantities and the corresponding resuting prices
+ */
+double trade_imp_pb_fwprop_deterministic(trade_impact_problem* pb, int verbose, int* optimal_sells, double* optimal_prices) {
 	// forward propagation (used to check path is correct)
 	int N = pb->N;
 	int T = pb->T;
@@ -126,81 +219,6 @@ double trade_imp_pb_fw_prop_deterministic(trade_impact_problem* pb, int verbose,
 		printf("Final profit best case: %g\n", profit);
 
 	return profit;
-}
-
-
-
-int trade_imp_pb_optimize(trade_impact_problem* pb, int verbose) {
-	int ret = 0;
-	double expected_revenue;
-	double best_expected_revenue;
-	int best_index;
-
-	double profit;
-	double newprice;
-	int sell;
-
-	int N = pb->N;
-	int T = pb->T;
-
-	int n, t;
-	int k, kp;
-
-	/*
-	 * Start with the last step
-	 */
-	t = T-1;
-	if (verbose >= 2) {
-		printf("t = %d\n", t); fflush(stdout);
-	}
-	best_expected_revenue = 0.0;
-	for (n = 0; n <= N; n++) {
-		expected_revenue = 0.0;
-		k = n; // trick because the quantity we are maximizing does not depend on n
-		for (kp = 0; kp <= k; kp++) {
-			expected_revenue += prob(pb, kp, k) * (double)kp;
-		}
-		expected_revenue *= pb->d[k];
-		if (expected_revenue > best_expected_revenue) {
-			best_expected_revenue = expected_revenue;
-		}
-		F(pb, t, n) = best_expected_revenue;
-		FP(pb, t, n) = n;
-	}
-
-	//printf("F(t=%d,.): ", T-1); UTLShowVector(N+1, &F(pb, t, 0));
-
-	/*
-	 * backward propagation
-	 */
-	for (t = T-2; t >= 0; t--) {
-		if (verbose >= 2) {
-			printf("t = %d\n", t); fflush(stdout);
-		}
-		for (n = 0; n <= N; n++) {
-			best_expected_revenue = 0.0;
-			best_index = 0;
-			for (k = 0; k <= n; k++) {
-				// compute the sum
-				expected_revenue = 0.0;
-				for (kp = 0; kp <= k; kp++) {
-					expected_revenue += prob(pb, kp, k) * ((double)kp + F(pb, t + 1, n - kp));
-				}
-				expected_revenue *= pb->d[k];
-				// update if best
-				if (expected_revenue > best_expected_revenue) {
-					best_expected_revenue = expected_revenue;
-					best_index = k;
-				}
-			}
-			// here we know the max
-			F(pb, t, n) = best_expected_revenue;
-			FP(pb, t, n) = best_index;
-		}
-	}
-
-
-	return 0;
 }
 
 

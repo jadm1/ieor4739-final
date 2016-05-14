@@ -6,11 +6,11 @@
 #include <utl.h>
 #include <bs.h>
 #include <ntqc.h>
+#include <tm_opt.h>
+#include <tm_priceshift_models.h>
+#include <tm_prob_models.h>
 
-#include <tmw_opt.h>
-#include <tmw_priceshift_models.h>
-#include <tmw_prob_models.h>
-#include <tmw_protocol.h>
+#include <tm_protocol.h>
 
 
 typedef struct test_client {
@@ -21,7 +21,7 @@ typedef struct test_client {
 
 
 
-int resultsavermain(test_client* client, char* address, const int port, int verbose) {
+int testmain(test_client* client, char* address, const int port, int verbose) {
 	int ret = 0;
 
 	trade_impact_problem* pb;
@@ -172,7 +172,7 @@ int resultsavermain(test_client* client, char* address, const int port, int verb
 				return -1;
 			}
 
-			trade_imp_pb_fw_prop_deterministic(pb, verbose, optimal_sells, optimal_prices);
+			trade_imp_pb_fwprop_deterministic(pb, verbose, optimal_sells, optimal_prices);
 
 			ret = trade_imp_pb_delete(&pb);
 
@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	ret = resultsavermain(client, address, port, verbose);
+	ret = testmain(client, address, port, verbose);
 	if (ret < 0) {
 		fprintf(stderr, "main(): error in jobsuppliermain()\n");
 		free(client);

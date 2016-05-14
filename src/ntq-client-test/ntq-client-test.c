@@ -14,7 +14,7 @@ typedef struct test_client {
 
 #define INPUT_SIZE 100
 
-int resultsavermain(test_client* client, int push, int qid, int req_num) {
+int testmain(test_client* client, int push, int qid, int req_num) {
 	int ret = 0;
 	char input[INPUT_SIZE];
 	int size;
@@ -166,7 +166,7 @@ int main(int argc, char** argv) {
 	client->server_port = port;
 
 
-	ret = resultsavermain(client, push, qid, req_num);
+	ret = testmain(client, push, qid, req_num);
 	if (ret < 0) {
 		fprintf(stderr, "main(): error in client()\n");
 		free(client);
