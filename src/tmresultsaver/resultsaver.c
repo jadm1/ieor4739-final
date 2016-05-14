@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
 
 	ret = resultsavermain(client, address, port, input_filename);
 	if (ret < 0) {
-		fprintf(stderr, "main(): error in workermain()\n");
+		fprintf(stderr, "main(): error in resultsavermain()\n");
 		free(client);
 		return -1;
 	}
