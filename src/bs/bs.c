@@ -1,24 +1,25 @@
 #include "bs.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ *  This file contains functions used to abstract low-level network programming
+ */
 
-#ifndef min
-#define min(a, b) ((b > a) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a, b) ((b > a) ? (b) : (a))
-#endif
 
+/*
+ * Local functions (not visible outside this file)
+ */
 int hnametoinaddr(const char* address, struct in_addr* p_ipv4);
 int inaddrtostr(const struct in_addr* p_ipv4, char* ips, int ips_size);
 int inttosaport(const int port, u_short* p_saport);
 int saporttoint(const u_short* p_saport, int* p_port);
 
 
-
+/*
+ * Returns an integer that is incremented on average every 1 ms.
+ */
 #ifdef OS_UNIX
 int get_ticks_ms(void)
 {
@@ -34,6 +35,9 @@ int get_ticks_ms(void)
 #endif
 
 
+/**
+ * Load the sockets library
+ */
 int loadsocklib()
 {
 #ifdef OS_WINDOWS
@@ -49,6 +53,9 @@ int loadsocklib()
 	return -1;
 }
 
+/**
+ * Unload the sockets library
+ */
 int freesocklib()
 {
 #ifdef OS_WINDOWS
@@ -60,6 +67,9 @@ int freesocklib()
 	return -1;
 }
 
+/**
+ * Create a TCP stream socket
+ */
 int socktcp(int* psocket) {
 	int sock;
 
@@ -73,6 +83,9 @@ int socktcp(int* psocket) {
 	return 0;
 }
 
+/**
+ * Close a socket
+ */
 int sockclose(int socket)
 {
 #ifdef OS_WINDOWS
@@ -115,7 +128,7 @@ int sendl(int socket, const void* buf, int size, int flags)
 	while (sent < size)
 	{
 		ret = send(socket, (const void*)p, size - sent, flags);
-		if (ret < 0)
+		if (ret < 0) // an error occurred
 			return -1;
 		if (ret == 0) {
 			// exit because no data sent (usually means socket disconnected)
@@ -172,6 +185,13 @@ int recvl(int socket, void* buf, int recvsize, int flags)
 	return rcvd;
 }
 
+/**
+ * This function returns 1 if the socket has activity on it. More specifically:
+ * If the socket is a server socket, it returns 1 if a connection has occurred, that is if we can call accept() without blocking
+ * If the socket is a client socket, it returns 1 if data has been received. A recv() call on that socket will not block.
+ * It returns 0 otherwise
+ * This function is useful if we have multiple clients connected, as we can regularly loop through them to see who is talking.
+ */
 
 int sockreadable(int socket)
 {
@@ -208,7 +228,9 @@ int sockreadable(int socket)
 	return -1;
 }
 
-
+/**
+ * Trick on some systems to prevent the port from being temporarily unavailable
+ */
 int setreuseaddr(int socket)
 {
 	int opt = 1;
@@ -221,74 +243,9 @@ int setreuseaddr(int socket)
 
 
 
-
-int hnametoinaddr(const char* address, struct in_addr* p_ipv4)
-{
-	struct hostent* rhost = NULL;
-	int i;
-
-	if (address == NULL) {
-		p_ipv4->s_addr = htonl(0);
-		return -1;
-	}
-	if (address[0] == '\0') {
-		p_ipv4->s_addr = htonl(0);
-		return -1;
-	}
-
-	for (i = 0; i < strlen(address); i++)
-	{
-		if ((((address[i] < '0') || (address[i] > '9')) && (address[i] != '.')) || (i >= 16))
-		{
-			rhost = gethostbyname(address);
-			if (rhost != NULL) {
-				p_ipv4->s_addr = *(u_long*)(rhost->h_addr_list[0]);
-				return 0;
-			}
-			else {
-				p_ipv4->s_addr = htonl(0);
-				return -1;
-			}
-		}
-	}
-
-	p_ipv4->s_addr = inet_addr(address);
-	return 0;
-}
-
-int inaddrtostr(const struct in_addr* p_ipv4, char* ips, int ips_size)
-{
-	strncpy(ips, inet_ntoa(*p_ipv4), ips_size);
-	return 0;
-}
-
-int inttosaport(const int port, u_short* p_saport) {
-	*p_saport = htons((unsigned short)port);
-	return 0;
-}
-
-int saporttoint(const u_short* p_saport, int* p_port) {
-	*p_port = (int)ntohs(*p_saport);
-	return 0;
-}
-
-int hnametoipv4(const char* address, char* ipv4str) {
-	int ret = 0;
-	struct in_addr ipv4;
-
-	ret = hnametoinaddr(address, &ipv4);
-	if (ret < 0) {
-		return -1;
-	}
-
-	ret = inaddrtostr(&ipv4, ipv4str, 16);
-	if (ret < 0) {
-		return -1;
-	}
-
-	return 0;
-}
-
+/**
+ * Connect to a server
+ */
 int sockconnect(int socket, const char* address, int port) {
 	int ret = 0;
 	struct sockaddr_in sin_c;
@@ -302,6 +259,10 @@ int sockconnect(int socket, const char* address, int port) {
 	return ret;
 }
 
+/**
+ * Bind and listen on a specified port and interface address
+ * n is the number of clients that can be waiting an accept() call (usually small)
+ */
 int socklisten(int socket, const char* address, int port, int n) {
 	int ret = 0;
 	struct sockaddr_in sin_s;
@@ -336,6 +297,9 @@ int socklisten(int socket, const char* address, int port, int n) {
 	return ret;
 }
 
+/**
+ * accept a new connection on the server socket and create a new corresponding client socket
+ */
 int sockaccept(int s_socket, int* p_c_socket, char* c_address, int* p_c_port) {
 	int ret = 0;
 	int socket_c;
@@ -362,4 +326,90 @@ int sockaccept(int s_socket, int* p_c_socket, char* c_address, int* p_c_port) {
 
 	return ret;
 }
+
+
+/**
+ * Convert a host name to and IPv4 address string
+ */
+
+int hnametoipv4(const char* address, char* ipv4str) {
+	int ret = 0;
+	struct in_addr ipv4;
+
+	ret = hnametoinaddr(address, &ipv4);
+	if (ret < 0) {
+		return -1;
+	}
+
+	ret = inaddrtostr(&ipv4, ipv4str, 16);
+	if (ret < 0) {
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * Local function
+ * Convert a hostname to an IPv4 format address ( struct in_addr)
+ */
+int hnametoinaddr(const char* address, struct in_addr* p_ipv4)
+{
+	struct hostent* rhost = NULL;
+	int i;
+
+	if (address == NULL) {
+		p_ipv4->s_addr = htonl(0);
+		return -1;
+	}
+	if (address[0] == '\0') {
+		p_ipv4->s_addr = htonl(0);
+		return -1;
+	}
+
+	for (i = 0; i < strlen(address); i++)
+	{
+		if ((((address[i] < '0') || (address[i] > '9')) && (address[i] != '.')) || (i >= 16))
+		{
+			rhost = gethostbyname(address);
+			if (rhost != NULL) {
+				p_ipv4->s_addr = *(u_long*)(rhost->h_addr_list[0]);
+				return 0;
+			}
+			else {
+				p_ipv4->s_addr = htonl(0);
+				return -1;
+			}
+		}
+	}
+
+	p_ipv4->s_addr = inet_addr(address);
+	return 0;
+}
+/**
+ * Local function
+ * Convert a struct in_addr IPv4 to a string
+ */
+int inaddrtostr(const struct in_addr* p_ipv4, char* ips, int ips_size)
+{
+	strncpy(ips, inet_ntoa(*p_ipv4), ips_size);
+	return 0;
+}
+/**
+ * Local function
+ * Convert a int port to a u_short port
+ */
+int inttosaport(const int port, u_short* p_saport) {
+	*p_saport = htons((unsigned short)port);
+	return 0;
+}
+/**
+ * Local function
+ * Convert a u_short port to a int port
+ */
+int saporttoint(const u_short* p_saport, int* p_port) {
+	*p_port = (int)ntohs(*p_saport);
+	return 0;
+}
+
 

@@ -46,8 +46,10 @@ CLFLAGS_MT = $(LBM) $(LBPTHREAD) $(LDPTHREAD)
 CLFLAGS_MTNW = $(LBM) $(LBPTHREAD) $(LBSOCKETS) $(LDPTHREAD)
 
 
+# specify targets
+
 UTL_ODIR = $(SDIR)/utl
-UTL_OBJ = $(UTL_ODIR)/utl.o
+UTL_OBJ = $(UTL_ODIR)/utl.o $(UTL_ODIR)/llq.o
 UTL_INC = 
 UTL_CCFLAGS = $(CCFLAGS_STD)
 
@@ -65,48 +67,52 @@ NTQS_ODIR = $(SDIR)/ntqs
 NTQS_INC = -I $(UTL_ODIR) -I $(BS_ODIR)
 NTQS_OBJ = $(NTQS_ODIR)/ntqsmain.o $(NTQS_ODIR)/ntqs.o $(NTQS_ODIR)/ntqsmanager.o
 NTQS_CCFLAGS = $(CCFLAGS_DBG)
-
 NTQS_BIN = $(BDIR)/ntqs
 NTQS_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQS_OBJ)
 NTQS_CLFLAGS = $(CLFLAGS_MTNW)
 
 
+TM_ODIR = $(SDIR)/tm
+TM_INC = -I $(UTL_ODIR)
+TM_OBJ = $(TM_ODIR)/tmw_opt.o  $(TM_ODIR)/tmw_priceshift_models.o $(TM_ODIR)/tmw_prob_models.o
+TM_CCFLAGS = $(CCFLAGS_OPT)
 
 TMWORKER_ODIR = $(SDIR)/tmworker
-TMWORKER_INC = -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR)
-TMWORKER_OBJ = $(TMWORKER_ODIR)/tmworkermain.o $(TMWORKER_ODIR)/tmw_opt.o  $(TMWORKER_ODIR)/tmw_priceshift_models.o $(TMWORKER_ODIR)/tmw_prob_models.o
-TMWORKER_CCFLAGS = $(CCFLAGS_OPT)
+TMWORKER_INC = -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR) -I $(TM_ODIR)
+TMWORKER_OBJ = $(TMWORKER_ODIR)/tmworkermain.o
+TMWORKER_CCFLAGS = $(CCFLAGS_DBG)
 TMWORKER_BIN = $(BDIR)/tmworker
-TMWORKER_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(TMWORKER_OBJ)
+TMWORKER_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(TM_OBJ) $(TMWORKER_OBJ)
 TMWORKER_CLFLAGS = $(CLFLAGS_NW)
 
 TMWORKERTEST_ODIR = $(SDIR)/tmworker-test
-TMWORKERTEST_INC = -I $(UTL_ODIR) -I $(TMWORKER_ODIR)
-TMWORKERTEST_OBJ = $(TMWORKERTEST_ODIR)/testmain.o $(TMWORKER_ODIR)/tmw_opt.o  $(TMWORKER_ODIR)/tmw_priceshift_models.o $(TMWORKER_ODIR)/tmw_prob_models.o
-TMWORKERTEST_CCFLAGS = $(CCFLAGS_OPT)
+TMWORKERTEST_INC = -I $(UTL_ODIR) -I $(TM_ODIR)
+TMWORKERTEST_OBJ = $(TMWORKERTEST_ODIR)/testmain.o
+TMWORKERTEST_CCFLAGS = $(CCFLAGS_DBG)
 TMWORKERTEST_BIN = $(BDIR)/tmworker-test
-TMWORKERTEST_BIN_OBJ = $(UTL_OBJ) $(TMWORKERTEST_OBJ)
+TMWORKERTEST_BIN_OBJ = $(UTL_OBJ) $(TM_OBJ) $(TMWORKERTEST_OBJ)
 TMWORKERTEST_CLFLAGS = $(CLFLAGS_STD)
 
 TMJOBSUPPLIER_ODIR = $(SDIR)/tmjobsupplier
-TMJOBSUPPLIER_INC = -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR) -I $(TMWORKER_ODIR)
-TMJOBSUPPLIER_OBJ = $(TMJOBSUPPLIER_ODIR)/tmjobsuppliermain.o $(TMWORKER_ODIR)/tmw_opt.o  $(TMWORKER_ODIR)/tmw_priceshift_models.o $(TMWORKER_ODIR)/tmw_prob_models.o
+TMJOBSUPPLIER_INC = -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR) -I $(TM_ODIR)
+TMJOBSUPPLIER_OBJ = $(TMJOBSUPPLIER_ODIR)/tmjobsuppliermain.o
 TMJOBSUPPLIER_CCFLAGS = $(CCFLAGS_DBG)
 TMJOBSUPPLIER_BIN = $(BDIR)/tmjobsupplier
-TMJOBSUPPLIER_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(TMJOBSUPPLIER_OBJ)
+TMJOBSUPPLIER_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(TM_OBJ) $(TMJOBSUPPLIER_OBJ)
 TMJOBSUPPLIER_CLFLAGS = $(CLFLAGS_NW)
 
 TMRESULTSAVER_ODIR = $(SDIR)/tmresultsaver
-TMRESULTSAVER_INC = -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR) -I $(TMWORKER_ODIR)
-TMRESULTSAVER_OBJ = $(TMRESULTSAVER_ODIR)/tmresultsavermain.o $(TMWORKER_ODIR)/tmw_opt.o  $(TMWORKER_ODIR)/tmw_priceshift_models.o $(TMWORKER_ODIR)/tmw_prob_models.o
+TMRESULTSAVER_INC = -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR) -I $(TM_ODIR)
+TMRESULTSAVER_OBJ = $(TMRESULTSAVER_ODIR)/tmresultsavermain.o
 TMRESULTSAVER_CCFLAGS = $(CCFLAGS_DBG)
 TMRESULTSAVER_BIN = $(BDIR)/tmresultsaver
-TMRESULTSAVER_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(TMRESULTSAVER_OBJ)
+TMRESULTSAVER_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(TM_OBJ) $(TMRESULTSAVER_OBJ)
 TMRESULTSAVER_CLFLAGS = $(CLFLAGS_NW)
 
 
+# specify make rules
 
-all: $(NTQS_BIN) $(BDIR)/ntq-client-str $(TMWORKER_BIN) $(TMWORKERTEST_BIN) $(TMJOBSUPPLIER_BIN) $(TMRESULTSAVER_BIN)
+all: $(NTQS_BIN) $(BDIR)/ntq-client-test $(TMWORKER_BIN) $(TMWORKERTEST_BIN) $(TMJOBSUPPLIER_BIN) $(TMRESULTSAVER_BIN)
 
 # compiling objects
 $(UTL_ODIR)/%.o: $(UTL_ODIR)/%.c
@@ -121,9 +127,12 @@ $(NTQC_ODIR)/%.o: $(NTQC_ODIR)/%.c
 $(NTQS_ODIR)/%.o: $(NTQS_ODIR)/%.c
 	$(CC) $(NTQS_CCFLAGS) -c $< -o $@ $(NTQS_INC)
 
-$(SDIR)/ntq-client-str/ntq-client-str.o: $(SDIR)/ntq-client-str/ntq-client-str.c
-	$(CC) $(CCFLAGS_DBG) -o $(SDIR)/ntq-client-str/ntq-client-str.o -c $(SDIR)/ntq-client-str/ntq-client-str.c -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR)
+$(SDIR)/ntq-client-test/ntq-client-test.o: $(SDIR)/ntq-client-test/ntq-client-test.c
+	$(CC) $(CCFLAGS_DBG) -o $(SDIR)/ntq-client-test/ntq-client-test.o -c $(SDIR)/ntq-client-test/ntq-client-test.c -I $(UTL_ODIR) -I $(BS_ODIR) -I $(NTQC_ODIR)
 
+
+$(TM_ODIR)/%.o: $(TM_ODIR)/%.c
+	$(CC) $(TM_CCFLAGS) -c $< -o $@ $(TM_INC)
 
 $(TMWORKER_ODIR)/%.o: $(TMWORKER_ODIR)/%.c
 	$(CC) $(TMWORKER_CCFLAGS) -c $< -o $@ $(TMWORKER_INC)
@@ -142,8 +151,8 @@ $(TMRESULTSAVER_ODIR)/%.o: $(TMRESULTSAVER_ODIR)/%.c
 $(NTQS_BIN): $(NTQS_BIN_OBJ)
 	$(CC) -o $(NTQS_BIN) $(NTQS_BIN_OBJ) $(NTQS_CLFLAGS)
 
-$(BDIR)/ntq-client-str: $(SDIR)/ntq-client-str/ntq-client-str.o $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ)
-	$(CC) -o $(BDIR)/ntq-client-str $(SDIR)/ntq-client-str/ntq-client-str.o $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(CLFLAGS_NW)
+$(BDIR)/ntq-client-test: $(SDIR)/ntq-client-test/ntq-client-test.o $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ)
+	$(CC) -o $(BDIR)/ntq-client-test $(SDIR)/ntq-client-test/ntq-client-test.o $(UTL_OBJ) $(BS_OBJ) $(NTQC_OBJ) $(CLFLAGS_NW)
 
 
 $(TMWORKER_BIN): $(TMWORKER_BIN_OBJ)
@@ -160,12 +169,13 @@ $(TMRESULTSAVER_BIN): $(TMRESULTSAVER_BIN_OBJ)
 
 
 clean:
-	rm $(NTQS_BIN) $(BDIR)/ntq-client-str $(TMWORKER_BIN) $(TMWORKERTEST_BIN) $(TMJOBSUPPLIER_BIN) $(TMRESULTSAVER_BIN) -f
+	rm $(NTQS_BIN) $(BDIR)/ntq-client-test $(TMWORKER_BIN) $(TMWORKERTEST_BIN) $(TMJOBSUPPLIER_BIN) $(TMRESULTSAVER_BIN) -f
 	rm $(UTL_ODIR)/*.o -f
 	rm $(BS_ODIR)/*.o -f
 	rm $(NTQC_ODIR)/*.o -f
 	rm $(NTQS_ODIR)/*.o -f
-	rm $(SDIR)/ntq-client-str/*.o -f
+	rm $(SDIR)/ntq-client-test/*.o -f
+	rm $(TM_ODIR)/*.o -f
 	rm $(TMWORKER_ODIR)/*.o -f
 	rm $(TMWORKERTEST_ODIR)/*.o -f
 	rm $(TMJOBSUPPLIER_ODIR)/*.o -f

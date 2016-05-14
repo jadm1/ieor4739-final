@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#include "tmw_priceshift_models.h"
-#include "tmw_prob_models.h"
+#include "../tm/tmw_priceshift_models.h"
+#include "../tm/tmw_prob_models.h"
 
 
 typedef struct trade_impact_problem {

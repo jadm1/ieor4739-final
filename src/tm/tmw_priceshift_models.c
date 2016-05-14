@@ -1,7 +1,8 @@
 
+#include "../tm/tmw_priceshift_models.h"
+
 #include <math.h>
 
-#include "tmw_priceshift_models.h"
 
 /**
  * price shift models

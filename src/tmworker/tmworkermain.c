@@ -7,10 +7,10 @@
 #include <bs.h>
 #include <ntqc.h>
 
-#include "tmw_priceshift_models.h"
-#include "tmw_prob_models.h"
-#include "tmw_opt.h"
-#include "tmw_protocol.h"
+#include <tmw_opt.h>
+#include <tmw_priceshift_models.h>
+#include <tmw_prob_models.h>
+#include <tmw_protocol.h>
 
 
 typedef struct test_client {
@@ -47,7 +47,7 @@ int resultsavermain(test_client* client, char* address, const int port, int verb
 	int prob_model_choice;
 
 
-	double profit;
+	//double profit;
 	int* optimal_sells;
 	double* optimal_prices;
 
@@ -172,7 +172,7 @@ int resultsavermain(test_client* client, char* address, const int port, int verb
 				return -1;
 			}
 
-			profit = trade_imp_pb_fw_prop_deterministic(pb, verbose, optimal_sells, optimal_prices);
+			trade_imp_pb_fw_prop_deterministic(pb, verbose, optimal_sells, optimal_prices);
 
 			ret = trade_imp_pb_delete(&pb);
 

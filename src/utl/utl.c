@@ -1,3 +1,9 @@
+
+/**
+ * This file contains utility functions for miscellaneous purposes
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,106 +21,11 @@
 
 
 
-typedef struct llq_node {
-	void* data;
-	struct llq_node* next;
-} llq_node;
-
-typedef struct llq {
-	llq_node* first;
-	llq_node* last;
-	int len;
-} llq;
-
-int llq_create(llq** pqueue) {
-	llq* queue = NULL;
-
-	queue = (llq*)malloc(sizeof(llq));
-	if (queue == NULL) {
-		*pqueue = NULL;
-		return -1;
-	}
-
-	queue->first = NULL;
-	queue->last = NULL;
-	queue->len = 0;
-
-	*pqueue = queue;
-	return 0;
-}
-
-void llq_delete(llq** pqueue) {
-	llq* queue = *pqueue;
-	if (queue == NULL) {
-		return;
-	}
-	free((void*)queue);
-	queue = NULL;
-	*pqueue = queue;
-	return;
-}
-
-int llq_isempty(llq* queue) {
-	return (queue->first == NULL && queue->last == NULL);
-	//return (queue->first == NULL); // equivalent
-	//return (queue->last == NULL);  // equivalent
-	//return (queue->len == 0); // equivalent
-}
-
-int llq_length(llq* queue) {
-	return queue->len;
-}
-
-int llq_push(llq* queue, void* data) {
-	llq_node* new_node = NULL;
-
-	new_node = (llq_node*)malloc(sizeof(llq_node));
-	if (new_node == NULL) {
-		return -1;
-	}
-	new_node->data = data;
-	new_node->next = NULL;
-
-	if (llq_isempty(queue)) {
-		queue->first = new_node;
-		queue->last = new_node;
-		queue->len++;
-		return 0;
-	} else {
-		queue->last->next = new_node;
-		queue->last = new_node;
-		queue->len++;
-		return 0;
-	}
-}
-
-void* llq_pop(llq* queue) {
-	llq_node* first_node = NULL;
-	void* data;
-
-	first_node = queue->first;
-	if (llq_isempty(queue)) {
-		return NULL;
-	}
-
-	if (queue->first == queue->last) {
-		queue->first = NULL;
-		queue->last = NULL;
-		queue->len--;
-	}
-	else {
-		queue->first = queue->first->next;
-		queue->len--;
-	}
-
-	data = first_node->data;
-	free(first_node);
-
-	return data;
-}
-
 #ifdef WIN32
-
+/**
+ * Generate a discrete uniform random int based on the seed, and update that seed
+ * This function is thread safe provided the seed is a non-shared variable
+ */
 int rand_r (unsigned int *seed)
 {
 	unsigned int result;
@@ -130,9 +41,10 @@ int rand_r (unsigned int *seed)
 #endif
 
 
-
-
-
+/**
+ * Generate a normal rv based on the rand_r seed, and update that seed
+ * This function is thread safe provided the seed is a non-shared variable
+ */
 double drawnormal_r(unsigned int *prseed)
 {
 	double U1, U2, drawn, pi;
@@ -147,7 +59,9 @@ double drawnormal_r(unsigned int *prseed)
 	return drawn;
 }
 
-
+/**
+ * Sleeps the specified number of milliseconds
+ */
 void UTLsleep(int ms)
 {
 #ifdef WIN32
@@ -177,7 +91,7 @@ void UTLFree(void **paddress)
 }
 
 
-/** print vector **/
+/** print vector of doubles **/
 void UTLShowVector(int n, double *vector)
 {
 	int j;
@@ -188,7 +102,7 @@ void UTLShowVector(int n, double *vector)
 	printf("\n");
 }
 
-/** print vector **/
+/** print vector of integers **/
 void UTLShowIntVector(int n, int *vector)
 {
 	int j;
@@ -199,7 +113,9 @@ void UTLShowIntVector(int n, int *vector)
 	printf("\n");
 }
 
-
+/**
+ * Returns a timestamp
+ */
 char* UTLGetTimeStamp(void)
 {
 	time_t timestamp;
@@ -208,7 +124,9 @@ char* UTLGetTimeStamp(void)
 	return (char *) ctime(&timestamp);
 }
 
-
+/**
+ * Returns a number that is incremented every ms on average.
+ */
 int UTLticks_ms()
 {
 #ifdef WIN32

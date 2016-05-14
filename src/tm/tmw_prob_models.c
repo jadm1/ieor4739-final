@@ -1,5 +1,5 @@
 
-#include "tmw_prob_models.h"
+#include "../tm/tmw_prob_models.h"
 
 #include <math.h>
 

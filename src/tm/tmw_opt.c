@@ -1,4 +1,6 @@
 
+#include "../tm/tmw_opt.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +8,6 @@
 
 #include <utl.h>
 
-#include "tmw_opt.h"
 
 
 

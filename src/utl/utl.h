@@ -1,6 +1,13 @@
 #ifndef UTL_H
 #define UTL_H
 
+
+/**
+ *   This file is the main and only header file for importing utility functions
+ *   and llq functions to manage queue data structures
+ */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,13 +28,14 @@ int rand_r (unsigned int *seed);
 #endif
 double drawnormal_r(unsigned int *prseed);
 
-
+char *UTLGetTimeStamp(void);
+int UTLticks_ms();
 void UTLsleep(int ms);
 void UTLFree(void **paddress);
 void UTLShowVector(int n, double *vector);
 void UTLShowIntVector(int n, int *vector);
-char *UTLGetTimeStamp(void);
-int UTLticks_ms();
+
+
 
 
 

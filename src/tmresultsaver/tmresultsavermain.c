@@ -10,7 +10,6 @@
 
 #include <tmw_protocol.h>
 
-
 typedef struct test_client {
 	ntq_server* server;
 	char* server_address;

@@ -4,9 +4,10 @@
 #include <math.h>
 
 #include <utl.h>
+
+#include <tmw_opt.h>
 #include <tmw_priceshift_models.h>
 #include <tmw_prob_models.h>
-#include <tmw_opt.h>
 
 
 
@@ -61,8 +62,6 @@ int main(int argc, char** argv) {
 
 	int N;
 	int T;
-	double alpha;
-	double pi;
 	//int verbose;
 
 
@@ -148,6 +147,9 @@ int main(int argc, char** argv) {
 	}
 	else {
 		parse_error = 1; print_usage(argv[0]); return -1;
+	}
+	if (parse_error) {
+		print_usage(argv[0]);
 	}
 
 	ret = resultsavermain(N, T, &priceshift_model, &prob_model);

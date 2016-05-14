@@ -1,6 +1,12 @@
 #ifndef BETTERSOCKETS_H
 #define BETTERSOCKETS_H
 
+/**
+ * This file is used to import functions described in bs.c
+ * Please refer to bs.c for more info
+ * This file contains functions used to abstract low-level network programming
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
