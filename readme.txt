@@ -7,7 +7,7 @@ run_server.sh
 Then submit the jobs to the server
 submit_jobs.sh
 
-Run as many worker as needed in parallel
+Run as many workers as needed in parallel
 run_worker.sh
 
 Save the results:
