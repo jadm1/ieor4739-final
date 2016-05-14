@@ -28,6 +28,10 @@ void handlesigint(int signal)
 }
 
 
+/**
+ *  This is the entry point of the ntq server program
+ *  All the parameters are parsed in that function
+ */
 int main(int argc, char** argv) {
 	int ret = 0;
 	int i;
@@ -99,6 +103,9 @@ int main(int argc, char** argv) {
 	}
 
 
+	/**
+	 * Here we called the server's main thread function
+	 */
 	ret = ntqserver(verbose, address, port, n_queues, n_managers);
 	if (ret < 0) {
 		fprintf(stderr, "main(): error in server()\n");

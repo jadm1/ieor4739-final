@@ -12,6 +12,11 @@
 #include <tm_protocol.h>
 
 
+/*
+ *  This is the job supplier program which reads an input file,
+ *  and sends its data to the (first) job input queue of a ntq server
+ */
+
 typedef struct test_client {
 	ntq_server* server;
 	char* server_address;

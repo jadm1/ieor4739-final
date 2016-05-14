@@ -7,8 +7,16 @@
 #include <bs.h>
 #include <ntqc.h>
 
-
 #include <tm_protocol.h>
+
+
+/*
+ *  This is the result saver program which
+ *  receives results data from the (second) job results queue of a ntq server
+ *  and then writes the downloaded data to an output file
+ */
+
+
 
 typedef struct test_client {
 	ntq_server* server;

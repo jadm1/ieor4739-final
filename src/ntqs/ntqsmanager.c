@@ -5,7 +5,15 @@
 #include "ntq_protocol.h"
 
 
-
+/**
+ *  This is a manager thread which runs a loop over all connected clients.
+ *  It gets a client from the client queue,
+ *  checks if it sent a request
+ *  If the client is inactive, it skips the client
+ *  Otherwise it will respond to what the client is requesting. (push/pop)
+ *  Once it is done the client is pushed to the queue and the next client is processed
+ *  If the client behaves badly, does not respect the protocol or does not respond, it is kicked off the server and deleted from the queue
+ */
 
 void* ntqmanagerwrapper(void* params) {
 	ntqs_manager* manager = (ntqs_manager*)params;

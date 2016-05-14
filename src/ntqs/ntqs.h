@@ -8,6 +8,10 @@ extern "C" {
 #include <utl.h>
 #include <bs.h>
 
+/**
+ *  This file is only a local header used by the server program for prototypes and internal data structures
+ */
+
 typedef struct ntqs_server {
 	int verbose;
 	int socket;

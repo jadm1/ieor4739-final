@@ -14,6 +14,9 @@ typedef struct test_client {
 
 #define INPUT_SIZE 100
 
+/**
+ * This program can be used to debug the ntq server by inputing strings or reading strings into any queue
+ */
 int testmain(test_client* client, int push, int qid, int req_num) {
 	int ret = 0;
 	char input[INPUT_SIZE];

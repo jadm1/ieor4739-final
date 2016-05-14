@@ -4,7 +4,10 @@
 #include "ntqs.h"
 
 /*
- * This is the main thread accepting connections to the server
+ * This is the main thread
+ * Its role consists in accepting connections to the server,
+ * and placing the new clients in a client queue where they will wait to
+ * be processed by the manager threads
  */
 int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers) {
 	int ret = 0;
@@ -28,16 +31,55 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 	}
 
 	ntqs->verbose = verbose;
+	/**
+	 *  Verbosity parameter
+	 */
 	ntqs->host_address = address;
+	/**
+	 *  This is the address on which the server listens.
+	 */
 	ntqs->host_port = port;
+	/**
+	 *  This is the server port number
+	 */
 	ntqs->n_queues = n_queues;
+	/**
+	 *  This is the number of queues (specified by the -q parameter) that will be created and accessible
+	 */
 	ntqs->n_managers = n_managers;
+	/*
+	 *  This is the number of manager threads that can be created to process clients.
+	 *  1 (the default value) should be sufficient in most cases.
+	 *  A higher number may give some speed ups only if there are many connections and/or clients need to transmit a lot of data.
+	 */
 	ntqs->socket = 0;
+	/**
+	 *  This is the server main socket used for accepting connections only
+	 */
 	ntqs->m_console = NULL;
-	ntqs->m_clients = NULL;
+	/**
+	 *  This is a console mutex used to prevent more than one thread at time from printing to the console
+	 */
 	ntqs->q_clients = NULL;
+	/**
+	 *  This is the client queue
+	 *  The manager threads are regularly popping clients from the queue in order to process them
+	 *  or pushing them back to the queue once they are done processing them.
+	 *  New clients are added to the queue, and disconnecting clients leave the queue.
+	 */
+	ntqs->m_clients = NULL;
+	/**
+	 *  This mutex is there to allow only one manager at a time to interact with the client queue
+	 */
 	ntqs->m_queues = NULL;
+	/*
+	 *  All task queues are mutex protected so that only one manager can push or pop data from a given queue at a given time
+	 */
 	ntqs->queues = NULL;
+	/**
+	 *  This is the array of the n_queues task queues
+	 */
+
 
 	// creating client queue mutex
 	ntqs->m_clients = &m_clients_data;
@@ -89,12 +131,18 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 	}
 
 
+	/**
+	 * Create a server socket
+	 */
 	ret = socktcp(&ntqs->socket);
 	if (ret < 0) {
 		fprintf(stderr, "ntqserver(): error socket creation failed\n");
 		return -1;
 	}
 
+	/**
+	 * Bind and listen
+	 */
 	ret = socklisten(ntqs->socket, ntqs->host_address, ntqs->host_port, 10);
 	if (ret < 0) {
 		fprintf(stderr, "ntqserver(): error socket listen failed\n");
@@ -150,6 +198,9 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 			return -1;
 		}
 
+		/**
+		 *  Start a manager thread
+		 */
 		ret = pthread_create(&manager->thread, NULL, &ntqmanagerwrapper, (void*)manager);
 		if (ret != 0) {
 			pthread_mutex_lock(ntqs->m_console);
@@ -189,7 +240,7 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 		}
 
 		if (ret == 0) {
-			// socket idle (no connection)
+			// socket idle (no new connection received)
 			UTLsleep(10); // nothing to do so go to sleep
 			// check for interrupt signal after sleeping (likely to happen while sleeping)
 			if (signal_interrupt) {
@@ -197,7 +248,7 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 			}
 		}
 		else {
-			// activity on socket -> accept new connection
+			// activity on socket -> accept new connection and write to the client data structure
 			ret = sockaccept(ntqs->socket, &client->socket, client->remote_ip, &client->remote_port);
 			if (ret < 0) {
 				pthread_mutex_lock(ntqs->m_console);
@@ -228,6 +279,9 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 	pthread_mutex_unlock(ntqs->m_console);
 
 	if (signal_interrupt) {
+		/*
+		 * Send interrupt signal to all the manager threads.
+		 */
 		for (i = 0; i < ntqs->n_managers; i++) {
 			manager = &managers[i];
 			pthread_mutex_lock(manager->m_interrupt);
@@ -237,11 +291,18 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 	}
 
 
+	/**
+	 * Wait for threads to end
+	 */
 	for (i = 0; i < ntqs->n_managers; i++) {
 		manager = &managers[i];
 		ret = pthread_join(manager->thread, NULL);
 		ret = pthread_mutex_destroy(manager->m_interrupt);
 	}
+
+	/**
+	 * Free all data
+	 */
 
 	free((void*)managers);
 	free((void*)m_interrupt_array);

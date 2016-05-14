@@ -14,12 +14,18 @@ extern "C" {
 #define NTQ_PUSH 0
 #define NTQ_POP  1
 
+/**
+ * Header for a PUSH/POP request message
+ */
 typedef struct ntq_req_header {
 	int req_type;
 	int queue_id;
 	int size;
 } ntq_req_header;
 
+/**
+ * Header for a message containing the data of a queue element
+ */
 typedef struct ntqs_q_element_hdr {
 	int size;
 } ntqs_q_element_hdr;

@@ -12,6 +12,13 @@
 
 #include <tm_protocol.h>
 
+/**
+ *  This is the worker program main source file.
+ *  It downloads a job from the job input queue of a ntq server.
+ *  It then works and finally it sends the results to the output queue of the ntq server.
+ */
+
+
 
 typedef struct test_client {
 	ntq_server* server;

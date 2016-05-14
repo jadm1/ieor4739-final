@@ -67,7 +67,7 @@ NTQS_ODIR = $(SDIR)/ntqs
 NTQS_INC = -I $(UTL_ODIR) -I $(BS_ODIR)
 NTQS_OBJ = $(NTQS_ODIR)/ntqsmain.o $(NTQS_ODIR)/ntqs.o $(NTQS_ODIR)/ntqsmanager.o
 NTQS_CCFLAGS = $(CCFLAGS_DBG)
-NTQS_BIN = $(BDIR)/ntqs
+NTQS_BIN = $(BDIR)/ntqserver
 NTQS_BIN_OBJ = $(UTL_OBJ) $(BS_OBJ) $(NTQS_OBJ)
 NTQS_CLFLAGS = $(CLFLAGS_MTNW)
 

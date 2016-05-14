@@ -9,7 +9,11 @@
 #include <tm_priceshift_models.h>
 #include <tm_prob_models.h>
 
-
+/**
+ * This program can be used to test the trade impact model optimization directly
+ * with a set of parameters from the command line
+ * It does not do any network operations.
+ */
 int testmain(int N, int T, trade_impact_priceshift_model* priceshift_model, trade_impact_prob_model* prob_model) {
 	int ret = 0;
 
@@ -23,7 +27,7 @@ int testmain(int N, int T, trade_impact_priceshift_model* priceshift_model, trad
 		return -1;
 	}
 
-	ret = trade_imp_pb_optimize(pb, 1);
+	ret = trade_imp_pb_optimize(pb, 2);
 	if (ret < 0) {
 		fprintf(stderr, "testmain(): error in optimize_trade()\n");
 		return -1;
