@@ -309,15 +309,18 @@ int ntqserver(int verbose, char* address, int port, int n_queues, int n_managers
 	ret = pthread_mutex_destroy(ntqs->m_console);
 	for (i = 0; i < ntqs->n_queues; i++) {
 		while (!llq_isempty(ntqs->queues[i])) {
-			client = (ntqs_client*)llq_pop(ntqs->queues[i]);
-			sockclose(client->socket);
-			free(client);
+			free(llq_pop(ntqs->queues[i]));
 		}
 		llq_delete(&ntqs->queues[i]);
 		ret = pthread_mutex_destroy(ntqs->m_queues[i]);
 	}
 	free((void*)m_queues_array);
 	free((void*)ntqs->queues);
+	while (!llq_isempty(ntqs->q_clients)) {
+		client = (ntqs_client*)llq_pop(ntqs->q_clients);
+		sockclose(client->socket);
+		free(client);
+	}
 	sockclose(ntqs->socket);
 	free((void*)ntqs->m_queues);
 	llq_delete(&ntqs->q_clients);
